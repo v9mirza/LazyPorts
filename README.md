@@ -1,56 +1,52 @@
-# lazyports
+# LazyPorts
 
-> **Visual port manager for Linux**
+> **The Modern Visual Port Manager for Linux**
 
-`lazyports` is a simple Terminal UI (TUI) tool to visualize which local processes are using which network ports, allowing you to easily kill them.
+![License](https://img.shields.io/badge/license-MIT-blue.svg) ![Go](https://img.shields.io/badge/Go-1.24+-00ADD8.svg)
 
-Built with **Go**, **Bubble Tea**, and **Lipgloss**.
+`lazyports` is a powerful Terminal UI (TUI) tool designed to visualize and manage your network ports effortlessly. built with **Bubble Tea** and **Lipgloss**, it brings a modern, interactive experience to the terminal.
 
-## Features
+## 🚀 Features
 
-- 🔍 ** visualize** open ports (TCP/UDP) and their owning processes.
-- 🎯 **Kill** processes directly from the list.
-- 🔄 **Auto-refresh** after killing a process.
-- ⌨️ **Keyboard-driven** interface.
+-   **Interactive Table**: Navigate through open ports with a clean, responsive UI.
+-   **Visual Status**: Instantly see `LISTEN` (●) vs `ESTAB` (↔) states.
+-   **Process Management**: Kill process blocking ports directly from the list.
+-   **Auto-Refresh**: state updates automatically after actions.
+-   **Zero Config**: Auto-detects shell (bash/zsh) and configures PATH.
 
-## Requirements
+## 📥 Installation
 
-- Linux
-- `ss` command (usually available by default in `iproute2` package)
-- Go 1.21+ (to build/run)
-
-## Installation
+Install in seconds with a single command:
 
 ```bash
-# Clone the repo
-git clone https://github.com/v9mirza/lazyports.git
-cd lazyports
-
-# Install dependencies
-go mod tidy
+curl -sL https://raw.githubusercontent.com/v9mirza/lazyports/main/install.sh | bash
 ```
 
-## Usage
+> **Note**: This will install `lazyports` to your system. It may ask for your password to install to `/usr/local/bin` for global access.
 
-Run the tool:
+## 🎮 Usage
+
+Run the tool from anywhere:
 
 ```bash
-go run main.go
-# OR build it
-go build -o lazyports
-./lazyports
+lazyports
 ```
 
-## Controls
+### Controls
 
 | Key | Action |
-| --- | --- |
+| :--- | :--- |
 | `↑` / `↓` | Navigate the list |
-| `k` | Kill the selected process (SIGTERM) |
+| `k` | Kill the selected process |
 | `r` | Refresh the list manually |
-| `q` | Quit |
+| `q` | Quit application |
 
-## License
+## 🛠️ Built With
+
+-   [Bubble Tea](https://github.com/charmbracelet/bubbletea) - The TUI framework
+-   [Lipgloss](https://github.com/charmbracelet/lipgloss) - Styling definitions
+-   [Bubbles](https://github.com/charmbracelet/bubbles) - TUI components
+
+## 📄 License
 
 MIT
-# lazyports
