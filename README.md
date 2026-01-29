@@ -1,32 +1,26 @@
 # LazyPorts
 
-> **The Modern Visual Port Manager for Linux**
+> **Visual port manager for Linux**
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg) ![Go](https://img.shields.io/badge/Go-1.24+-00ADD8.svg)
 
-`lazyports` is a powerful Terminal UI (TUI) tool designed to visualize and manage your network ports effortlessly. built with **Bubble Tea** and **Lipgloss**, it brings a modern, interactive experience to the terminal.
+`lazyports` is a terminal UI tool to visualize and manage network ports. It provides an interactive table to inspect listening processes and kill them easily.
 
-## 🚀 Features
+Built with Bubble Tea and Lipgloss.
 
--   **Interactive Table**: Navigate through open ports with a clean, responsive UI.
--   **Visual Status**: Instantly see `LISTEN` (●) vs `ESTAB` (↔) states.
--   **Process Management**: Kill process blocking ports directly from the list.
--   **Auto-Refresh**: state updates automatically after actions.
--   **Zero Config**: Auto-detects shell (bash/zsh) and configures PATH.
+## Installation
 
-## 📥 Installation
-
-Install in seconds with a single command:
+Install with a single command:
 
 ```bash
 curl -sL https://raw.githubusercontent.com/v9mirza/lazyports/main/install.sh | bash
 ```
 
-> **Note**: This will install `lazyports` to your system. It may ask for your password to install to `/usr/local/bin` for global access.
+*Note: The script may request `sudo` permission to install the binary to `/usr/local/bin` for system-wide access.*
 
-## 🎮 Usage
+## Usage
 
-Run the tool from anywhere:
+Run the tool from your terminal:
 
 ```bash
 lazyports
@@ -36,17 +30,18 @@ lazyports
 
 | Key | Action |
 | :--- | :--- |
-| `↑` / `↓` | Navigate the list |
-| `k` | Kill the selected process |
-| `r` | Refresh the list manually |
-| `q` | Quit application |
+| `↑` / `↓` | Navigate list |
+| `k` | Kill selected process |
+| `r` | Refresh list |
+| `q` | Quit |
 
-## 🛠️ Built With
+## Features
 
--   [Bubble Tea](https://github.com/charmbracelet/bubbletea) - The TUI framework
--   [Lipgloss](https://github.com/charmbracelet/lipgloss) - Styling definitions
--   [Bubbles](https://github.com/charmbracelet/bubbles) - TUI components
+-   **Interactive Table**: Clean visualization of open ports (TCP/UDP).
+-   **Process Management**: Terminate blocking processes instantly.
+-   **Visual States**: Distinct indicators for `LISTEN` and `ESTAB` connections.
+-   **Zero Config**: Works out of the box with automatic shell path configuration.
 
-## 📄 License
+## License
 
 MIT
