@@ -8,6 +8,10 @@
 
 Built with Bubble Tea and Lipgloss.
 
+## Prerequisites
+
+-   **Go 1.24** or higher (required for installation)
+
 ## Installation
 
 Install with a single command:
