@@ -19,8 +19,8 @@ echo -e "${BLUE}===============================${NC}"
 if command -v go >/dev/null 2>&1; then
     echo -e "${GREEN}[+] Go detected. Installing via go install...${NC}"
     
-    # Run go install
-    if go install github.com/$REPO@latest; then
+    # Run go install with GOPROXY=direct to bypass cache lag
+    if GOPROXY=direct go install github.com/$REPO@main; then
         echo -e "${GREEN}[SUCCESS] Lazyports installed successfully!${NC}"
         
         # Check if GOBIN is in PATH
