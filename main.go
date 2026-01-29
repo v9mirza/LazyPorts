@@ -20,6 +20,12 @@ var (
 	// Status/Footer styles
 	statusStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 	helpStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).MarginTop(1)
+
+	// Logo Style
+	logoStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("57")).
+			Bold(true).
+			MarginBottom(1)
 )
 
 // PortEntry represents a single process listening on a port
@@ -167,9 +173,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		baseStyle = baseStyle.Width(m.width - 2).Height(m.height - 4) // Reserve space for borders/footer
 		m.table.SetWidth(m.width - 4)
-		// Calculate table height: Window height - header/borders - footer
-		// A rough estimate to fit inside the baseStyle border
-		tableHeight := m.height - 6
+		// Calculate table height: Window height - header/borders - footer - LOGO
+		// Logo takes 3 lines + margin = 4 lines approximately.
+		// Borders/Footer take ~6 lines
+		// Total chrome = 10 lines
+		tableHeight := m.height - 10
 		if tableHeight < 3 {
 			tableHeight = 3
 		}
@@ -214,6 +222,11 @@ func (m model) View() string {
 		return fmt.Sprintf("Error: %v\nPress 'q' to quit", m.err)
 	}
 
+	logoStr := `
+┬  ┌─┐┌─┐┬ ┬  ┌─┐┌─┐┬─┐┌┬┐┌─┐
+│  ├─┤┌─┘└┬┘  ├─┘│ │├┬┘ │ └─┐
+┴─┘┴ ┴└─┘ ┴   ┴  └─┘┴└─ ┴ └─┘`
+	logo := logoStyle.Render(logoStr)
 	tableView := baseStyle.Render(m.table.View())
 
 	// Footer
@@ -222,10 +235,8 @@ func (m model) View() string {
 		controls = statusStyle.Render(m.status) + " • " + controls
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left,
-		tableView,
-		helpStyle.Render(controls),
-	)
+	// Use explicit newlines instead of JoinVertical to ensure rendering
+	return fmt.Sprintf("%s\n%s\n%s", logo, tableView, helpStyle.Render(controls))
 }
 
 func main() {
