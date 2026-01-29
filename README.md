@@ -6,7 +6,7 @@
 
 `lazyports` is a terminal UI tool to visualize and manage network ports. It provides an interactive table to inspect listening processes and kill them easily.
 
-![LazyPorts Demo](demo.png)
+![LazyPorts Demo](assets/image.png)
 
 Built with Bubble Tea and Lipgloss.
 
