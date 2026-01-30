@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -147,6 +148,22 @@ func getPorts() ([]PortEntry, error) {
 			Address:  address,
 		})
 	}
+
+	// Sort entries by Port (numerically) and then Protocol
+	sort.Slice(entries, func(i, j int) bool {
+		p1, err1 := strconv.Atoi(entries[i].Port)
+		p2, err2 := strconv.Atoi(entries[j].Port)
+
+		if err1 == nil && err2 == nil {
+			if p1 == p2 {
+				return entries[i].Protocol < entries[j].Protocol
+			}
+			return p1 < p2
+		}
+		// Fallback for non-numeric ports (rare)
+		return entries[i].Port < entries[j].Port
+	})
+
 	return entries, nil
 }
 
