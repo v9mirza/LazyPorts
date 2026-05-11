@@ -1,6 +1,6 @@
 # LazyPorts
 
-> **Visual port manager for Linux**
+> **Visual port manager for Linux and macOS**
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Go](https://img.shields.io/badge/Go-1.24+-00ADD8.svg)
@@ -15,6 +15,8 @@ Built with Bubble Tea and Lipgloss.
 ## Prerequisites
 
 -   **Go 1.24** or higher (required for installation)
+-   **Linux**: `ss` from iproute2
+-   **macOS**: `lsof` (included with macOS)
 
 ## Installation
 
