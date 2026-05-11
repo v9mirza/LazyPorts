@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -29,12 +31,48 @@ var (
 )
 
 func getPorts() ([]PortEntry, error) {
+	if runtime.GOOS == "darwin" {
+		return getDarwinPorts()
+	}
+
 	cmd := exec.Command("ss", "-tulnp")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("failed to run ss: %v", err)
 	}
 
+	return parseSSPorts(string(output)), nil
+}
+
+func getDarwinPorts() ([]PortEntry, error) {
+	tcpOutput, err := lsofOutput("-nP", "-iTCP", "-sTCP:LISTEN")
+	if err != nil {
+		return nil, fmt.Errorf("failed to run lsof for TCP ports: %v", err)
+	}
+
+	udpOutput, err := lsofOutput("-nP", "-iUDP")
+	if err != nil {
+		return nil, fmt.Errorf("failed to run lsof for UDP ports: %v", err)
+	}
+
+	return dedupePorts(parseLSOFPorts(string(tcpOutput) + "\n" + string(udpOutput))), nil
+}
+
+func lsofOutput(args ...string) ([]byte, error) {
+	output, err := exec.Command("lsof", args...).Output()
+	if err == nil {
+		return output, nil
+	}
+
+	var exitErr *exec.ExitError
+	if errors.As(err, &exitErr) && len(output) == 0 {
+		return output, nil
+	}
+
+	return output, err
+}
+
+func parseSSPorts(output string) []PortEntry {
 	lines := strings.Split(string(output), "\n")
 	var entries []PortEntry
 
@@ -105,7 +143,82 @@ func getPorts() ([]PortEntry, error) {
 		})
 	}
 
-	return entries, nil
+	return entries
+}
+
+func parseLSOFPorts(output string) []PortEntry {
+	lines := strings.Split(output, "\n")
+	var entries []PortEntry
+
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if len(fields) < 9 || fields[0] == "COMMAND" {
+			continue
+		}
+
+		proto := strings.ToLower(fields[7])
+		if proto != "tcp" && proto != "udp" {
+			continue
+		}
+
+		name := fields[8]
+		if strings.Contains(name, "->") {
+			continue
+		}
+
+		address, port, ok := splitHostPort(name)
+		if !ok || port == "*" {
+			continue
+		}
+
+		state := "LISTEN"
+		if proto == "udp" {
+			state = "UDP"
+		}
+
+		entries = append(entries, PortEntry{
+			Port:     port,
+			Protocol: proto,
+			PID:      fields[1],
+			Process:  strings.ReplaceAll(fields[0], `\x20`, " "),
+			State:    state,
+			Address:  normalizeAddress(address),
+		})
+	}
+
+	return entries
+}
+
+func dedupePorts(entries []PortEntry) []PortEntry {
+	seen := make(map[PortEntry]bool)
+	deduped := make([]PortEntry, 0, len(entries))
+
+	for _, entry := range entries {
+		if seen[entry] {
+			continue
+		}
+		seen[entry] = true
+		deduped = append(deduped, entry)
+	}
+
+	return deduped
+}
+
+func splitHostPort(value string) (string, string, bool) {
+	lastColon := strings.LastIndex(value, ":")
+	if lastColon == -1 || lastColon == len(value)-1 {
+		return "", "", false
+	}
+
+	return value[:lastColon], value[lastColon+1:], true
+}
+
+func normalizeAddress(address string) string {
+	if address == "*" || address == "0.0.0.0" || address == "[::]" {
+		return "All Interfaces"
+	}
+
+	return strings.Trim(address, "[]")
 }
 
 func killProcess(pid string) error {
@@ -128,8 +241,12 @@ func getProcessDetails(pid string) (string, error) {
 		return "Process details require sudo privileges.", nil
 	}
 
-	// Run ps to get details: User, Start Time, Command
-	cmd := exec.Command("ps", "-p", pid, "-o", "user,lstart,cmd", "--no-headers")
+	var cmd *exec.Cmd
+	if runtime.GOOS == "darwin" {
+		cmd = exec.Command("ps", "-p", pid, "-o", "user=,lstart=,command=")
+	} else {
+		cmd = exec.Command("ps", "-p", pid, "-o", "user,lstart,cmd", "--no-headers")
+	}
 	output, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("failed to get details: %v", err)
